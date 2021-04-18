@@ -11,7 +11,7 @@ async function connectToWhatsApp() {
 
     fs.existsSync('./session.json') && conn.loadAuthInfo('./session.json');
     await conn.connect();
-    fs.writeFileSync('./session.json', JSON.stringify(conn.base64EncodedAuthInfo(), null, '\t'));
+    fs.writeFileSync('./session.json', JSON.stringify(conn.base64EncodedAuthInfo()));
 
     conn.on('chat-update', async (chat) => {
         try {
