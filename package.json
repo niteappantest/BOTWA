@@ -1,0 +1,26 @@
+{
+  "name": "BOTWA",
+  "version": "1.0.0",
+  "description": "BOT OBOT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbahagus/BOTWA.git"
+  },
+  "keywords": [],
+  "author": "AgustD",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbahagus/BOTWA/issues"
+  },
+  "homepage": "https://github.com/mbahagus/BOTWA#readme",
+  "dependencies": {
+    "@adiwajshing/baileys": "^3.5.0",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {}
+}
