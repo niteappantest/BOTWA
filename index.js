@@ -73,7 +73,7 @@ async function connectToWhatsApp() {
                                 `-vcodec`,
                                 `libwebp`,
                                 `-vf`,
-                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=10, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
+                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
                             ])
                             .save(fileName);
                     } else {
@@ -88,7 +88,7 @@ async function connectToWhatsApp() {
                         const video = await conn.downloadAndSaveMediaMessage(download);
                         const fileName = randInt(".webp");
                         await ffmpeg(`./${video}`)
-                            .inputFormat(video.split(".")[1])
+                            .input(video)
                             .on("error", function (error) {
                                 console.log(error);
                                 fs.unlinkSync(video);
