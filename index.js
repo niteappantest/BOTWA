@@ -60,14 +60,14 @@ async function connectToWhatsApp() {
                         await ffmpeg(`./${gambar}`)
                             .input(gambar)
                             .on("error", function (error) {
-                                console.log(error)
-                                .then(() => fs.unlinkSync(gambar))
-                                .then(() => conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text));
+                                console.log(error);
+                                fs.unlinkSync(gambar);
+                                conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
                             })
                             .on("end", function () {
-                                conn.sendMessage(from, fs.readFileSync(fileName), MessageType.sticker)
-                                .then(() => fs.unlinkSync(gambar))
-                                .then(() => fs.unlinkSync(fileName));
+                                conn.sendMessage(from, fs.readFileSync(fileName), MessageType.sticker);
+                                fs.unlinkSync(gambar);
+                                fs.unlinkSync(fileName);
                             })
                             .addOutputOptions([
                                 `-vcodec`,
@@ -90,14 +90,14 @@ async function connectToWhatsApp() {
                         await ffmpeg(`./${video}`)
                             .inputFormat(video.split(".")[1])
                             .on("error", function (error) {
-                                console.log(error)
-                                    .then(() => fs.unlinkSync(video))
-                                    .then(() => conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text));
+                                console.log(error);
+                                fs.unlinkSync(video);
+                                conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
                             })
                             .on("end", function () {
-                                conn.sendMessage(from, fs.readFileSync(fileName), MessageType.sticker)
-                                    .then(() => fs.unlinkSync(video))
-                                    .then(() => fs.unlinkSync(fileName));
+                                conn.sendMessage(from, fs.readFileSync(fileName), MessageType.sticker);
+                                fs.unlinkSync(video);
+                                fs.unlinkSync(fileName);
                             })
                             .addOutputOptions([
                                 `-vcodec`,
