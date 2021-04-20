@@ -2,8 +2,11 @@ const {
     WAConnection,
     MessageType
 } = require("@adiwajshing/baileys");
+const { 
+    exec 
+} = require("child_process");
 const fs = require("fs");
-const ffmpeg = require('fluent-ffmpeg');
+const ffmpeg = require("fluent-ffmpeg");
 
 const prefix = "!"
 const pesan = {
@@ -37,6 +40,7 @@ async function connectToWhatsApp() {
             const media = (type === 'imageMessage' || type === 'videoMessage');
             const mediaImage = type === 'extendedTextMessage' && content.includes('imageMessage');
             const mediaVideo = type === 'extendedTextMessage' && content.includes('videoMessage');
+            const mediaStiker = type === 'extendedTextMessage' && content.includes('stickerMessage');
 
             switch (command) {
                 case prefix + "help":
@@ -52,7 +56,7 @@ async function connectToWhatsApp() {
                     if (media || mediaImage) {
                         const download = mediaImage ? JSON.parse(JSON.stringify(chat).replace("quotedM", "m")).message.extendedTextMessage.contextInfo : chat;
                         const gambar = await conn.downloadAndSaveMediaMessage(download);
-                        fileName = randInt(".webp");
+                        const fileName = randInt(".webp");
                         await ffmpeg(`./${gambar}`)
                             .input(gambar)
                             .on("error", function (error) {
@@ -69,7 +73,7 @@ async function connectToWhatsApp() {
                                 `-vcodec`,
                                 `libwebp`,
                                 `-vf`,
-                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=1, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
+                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=10, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
                             ])
                             .save(fileName);
                     } else {
@@ -82,7 +86,7 @@ async function connectToWhatsApp() {
                     if (media || mediaVideo) {
                         const download = mediaVideo ? JSON.parse(JSON.stringify(chat).replace("quotedM", "m")).message.extendedTextMessage.contextInfo : chat;
                         const video = await conn.downloadAndSaveMediaMessage(download);
-                        fileName = randInt(".webp");
+                        const fileName = randInt(".webp");
                         await ffmpeg(`./${video}`)
                             .inputFormat(video.split(".")[1])
                             .on("error", function (error) {
@@ -102,6 +106,23 @@ async function connectToWhatsApp() {
                                 `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=10, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
                             ])
                             .save(fileName);
+                    } else {
+                        conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
+                    }
+                    break;
+                case prefix + "toimg":
+                case prefix + "toimage":
+                    if (media || mediaStiker) {
+                        const download = mediaStiker ? JSON.parse(JSON.stringify(chat).replace('quotedM','m')).message.extendedTextMessage.contextInfo : chat;
+                        const stiker = await conn.downloadAndSaveMediaMessage(download);
+                        const fileName = randInt('.jpg');
+                        await exec(`ffmpeg -i ${stiker} ${fileName}`, (error) => {
+                            fs.unlinkSync(stiker);
+                            if (error) return console.log(error);
+                            sticker = fs.readFileSync(fileName);
+                            conn.sendMessage(from, sticker, MessageType.image);
+                            fs.unlinkSync(fileName);
+                        });
                     } else {
                         conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
                     }
