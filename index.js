@@ -36,6 +36,7 @@ async function connectToWhatsApp() {
 
             const media = (type === 'imageMessage' || type === 'videoMessage');
             const mediaImage = type === 'extendedTextMessage' && content.includes('imageMessage');
+            const mediaVideo = type === 'extendedTextMessage' && content.includes('videoMessage');
 
             switch (command) {
                 case prefix + "tes":
@@ -63,14 +64,43 @@ async function connectToWhatsApp() {
                                 `-vcodec`,
                                 `libwebp`,
                                 `-vf`,
-                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=15, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
+                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=1, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
                             ])
                             .save(fileName);
                     } else {
                         conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
                     }
                     break;
-
+                case prefix + "sgif":
+                case prefix + "stikergif":
+                case prefix + "stickergif":
+                    if (media || mediaVideo) {
+                        const download = mediaVideo ? JSON.parse(JSON.stringify(chat).replace("quotedM", "m")).message.extendedTextMessage.contextInfo : chat;
+                        const video = await conn.downloadAndSaveMediaMessage(download);
+                        fileName = randInt(".webp");
+                        await ffmpeg(`./${video}`)
+                            .inputFormat(video.split(".")[1])
+                            .on("error", function (error) {
+                                console.log(error)
+                                    .then(() => fs.unlinkSync(video))
+                                    .then(() => conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text));
+                            })
+                            .on("end", function () {
+                                conn.sendMessage(from, fs.readFileSync(fileName), MessageType.sticker)
+                                    .then(() => fs.unlinkSync(video))
+                                    .then(() => fs.unlinkSync(fileName));
+                            })
+                            .addOutputOptions([
+                                `-vcodec`,
+                                `libwebp`,
+                                `-vf`,
+                                `scale='min(320,iw)':min'(320,ih)':force_original_aspect_ratio=decrease,fps=10, pad=320:320:-1:-1:color=white@0.0, split [a][b]; [a] palettegen=reserve_transparent=on:transparency_color=ffffff00 [p]; [b][p] paletteuse`,
+                            ])
+                            .save(fileName);
+                    } else {
+                        conn.sendMessage(from, `${pesan.kesalahan}`, MessageType.text);
+                    }
+                    break;
             }
         } catch (error) {
             console.log(error);
