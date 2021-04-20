@@ -39,6 +39,11 @@ async function connectToWhatsApp() {
             const mediaVideo = type === 'extendedTextMessage' && content.includes('videoMessage');
 
             switch (command) {
+                case prefix + "help":
+                case prefix + "menu":
+                    const listCommand = require("./lib/help");
+                    conn.sendMessage(from, listCommand.help(prefix), MessageType.text);
+                    break;
                 case prefix + "tes":
                     conn.sendMessage(from, "OK", MessageType.text);
                     break;
